@@ -1,67 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Employee Entry Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
+    label { display:block; margin-top:10px; }
+    select,input { width:100%; padding:6px; margin-top:6px; box-sizing:border-box; }
+    button { margin-top:12px; padding:8px 12px; }
+  </style>
 </head>
 <body>
   <h2>Employee Data Entry</h2>
 
   <form id="employeeForm">
-    
-    <label>PO Name:</label>
-    <select id="po" required>
-      <option value="">Select PO</option>
-    </select><br><br>
+    <label>PO Name:
+      <select id="po" required>
+        <option value="">Select PO</option>
+      </select>
+    </label>
 
-    <label>Division:</label>
-    <select id="division" required>
-      <option value="">Select Division</option>
-    </select><br><br>
+    <label>Division:
+      <select id="division" required>
+        <option value="">Select Division</option>
+      </select>
+    </label>
 
-    <label>District:</label>
-    <select id="district" required>
-      <option value="">Select District</option>
-    </select><br><br>
+    <label>District:
+      <select id="district" required>
+        <option value="">Select District</option>
+      </select>
+    </label>
 
-    <label>Upazilla:</label>
-    <select id="upazilla" required>
-      <option value="">Select Upazilla</option>
-    </select><br><br>
+    <label>Upazilla:
+      <select id="upazilla" required>
+        <option value="">Select Upazilla</option>
+      </select>
+    </label>
 
-    <label>Branch:</label>
-    <select id="branch" required>
-      <option value="">Select Branch</option>
-    </select><br><br>
+    <label>Branch:
+      <select id="branch" required>
+        <option value="">Select Branch</option>
+      </select>
+    </label>
 
-    <label>Employee Name:</label>
-    <input type="text" id="name" required><br><br>
+    <label>Employee Name:
+      <input type="text" id="name" required />
+    </label>
 
-    <label>Designation:</label>
-    <input type="text" id="designation" required><br><br>
+    <label>Designation:
+      <input type="text" id="designation" required />
+    </label>
 
-    <label>Age:</label>
-    <input type="number" id="age" required><br><br>
+    <label>Age:
+      <input type="number" id="age" required />
+    </label>
 
-    <label>Gender:</label>
-    <select id="gender" required>
-      <option value="">Select Gender</option>
-      <option>Male</option>
-      <option>Female</option>
-      <option>Other</option>
-    </select><br><br>
+    <label>Gender:
+      <select id="gender" required>
+        <option value="">Select Gender</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+    </label>
 
-    <label>Phone Number:</label>
-    <input type="text" id="phone" required><br><br>
+    <label>Phone Number:
+      <input type="text" id="phone" required />
+    </label>
 
     <button type="submit">Submit</button>
   </form>
 
+  <!-- Make sure script.js is in same folder -->
   <script src="script.js"></script>
 </body>
 </html>
-
-  <script src="script.js"></script>
-</body>
-</html>
-
