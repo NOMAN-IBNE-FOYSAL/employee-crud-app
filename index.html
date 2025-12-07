@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Employee Form</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Employee Entry Form</h2>
+  <form id="employeeForm">
+    <label>PO Name:
+      <select id="po"></select>
+    </label><br>
+
+    <label>Division:
+      <select id="division"></select>
+    </label><br>
+
+    <label>District:
+      <select id="district"></select>
+    </label><br>
+
+    <label>Upazilla:
+      <select id="upazilla"></select>
+    </label><br>
+
+    <label>Branch:
+      <select id="branch"></select>
+    </label><br>
+
+    <label>Name: <input type="text" id="name" required></label><br>
+    <label>Designation: <input type="text" id="designation" required></label><br>
+    <label>Age: <input type="number" id="age" required></label><br>
+    <label>Gender:
+      <select id="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </label><br>
+    <label>Phone: <input type="text" id="phone" required></label><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script src="script.js"></script>
+</body>
+</html>
