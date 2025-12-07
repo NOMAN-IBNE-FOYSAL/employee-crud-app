@@ -104,7 +104,7 @@ document.getElementById("employeeForm").addEventListener("submit", function (e) 
     phone: document.getElementById("phone").value
   };
 
-  fetch("YOUR_WEB_APP_URL_HERE", {
+  fetch("https://script.google.com/macros/s/AKfycbz6WowyBXEdiN9iAfHS1fkfCsvyq0Ymaxc2v6LFpEJ4LBcG548RmNgURALpe4BRu8nH/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -122,5 +122,6 @@ document.getElementById("employeeForm").addEventListener("submit", function (e) 
 });
   .catch(err => alert("Fetch error: " + err));
 });
+
 
 
