@@ -21,7 +21,7 @@ const upazillas = {
 };
 const branches = ["Branch 1", "Branch 2"];
 
-// --- Populate dropdowns ---
+// Populate dropdowns
 const poSelect = document.getElementById("po");
 poList.forEach(po => poSelect.add(new Option(po, po)));
 
@@ -50,7 +50,7 @@ upazillaSelect.addEventListener("change", () => {
   branches.forEach(b => branchSelect.add(new Option(b, b)));
 });
 
-// --- Handle form submit ---
+// Handle form submission
 document.getElementById("employeeForm").addEventListener("submit", e => {
   e.preventDefault();
 
@@ -67,12 +67,21 @@ document.getElementById("employeeForm").addEventListener("submit", e => {
     phone: document.getElementById("phone").value
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbxqjGkbrdFfX3f-8zt2jY6lwU85pq6yew5nrxwk9JhH4Ju7CI7j8fKRe6evAolhGlfP/exec", {  
+  fetch("YOUR_WEB_APP_URL_HERE", { // Replace with your Web App URL
     method: "POST",
-    mode: "no-cors",  // prevents CORS errors
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify(payload)
-  }).then(() => {
-    alert("Employee added successfully!");
-    document.getElementById("employeeForm").reset();
-  }).catch(err => alert("Error: " + err));
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.result === "success") {
+      alert("Employee added successfully!");
+      document.getElementById("employeeForm").reset();
+    } else {
+      alert("Error: " + data.message);
+    }
+  })
+  .catch(err => alert("Fetch error: " + err));
 });
