@@ -1,95 +1,150 @@
+// Structure: PO -> Division -> District -> Upazilla -> [Branches array]
 const data = {
   "PO1": {
-    "Dhaka": {
-      "Dhaka": {
+    "Dhaka Division": {
+      "Dhaka District": {
         "Dhanmondi": ["Branch A", "Branch B"],
         "Mirpur": ["Branch C"]
       },
-      "Gazipur": {
+      "Gazipur District": {
         "Tongi": ["Branch D"],
         "Kaliakair": ["Branch E"]
       }
     },
-
-    "Chattogram": {
-      "Chattogram": {
+    "Chattogram Division": {
+      "Chattogram District": {
         "Pahartali": ["Branch F"]
+      }
+    }
+  },
+
+  "PO2": {
+    "Rajshahi Division": {
+      "Rajshahi District": {
+        "Boalia": ["Branch G"]
       }
     }
   }
 };
 
-// ======== DOM ELEMENTS =========
-const poSelect = document.getElementById("po");
-const divisionSelect = document.getElementById("division");
-const districtSelect = document.getElementById("district");
-const upazillaSelect = document.getElementById("upazilla");
-const branchSelect = document.getElementById("branch");
+// ---------------------- Helpers & DOM ----------------------
+const el = id => document.getElementById(id);
 
-// ======== POPULATE PO =========
-Object.keys(data).forEach(po => {
-  poSelect.innerHTML += <option value="${po}">${po}</option>;
-});
+const poSelect = el('po');
+const divisionSelect = el('division');
+const districtSelect = el('district');
+const upazillaSelect = el('upazilla');
+const branchSelect = el('branch');
 
-// ======== ON PO CHANGE =========
-poSelect.addEventListener("change", () => {
-  divisionSelect.innerHTML = "<option value=''>Select Division</option>";
-  districtSelect.innerHTML = "<option value=''>Select District</option>";
-  upazillaSelect.innerHTML = "<option value=''>Select Upazilla</option>";
-  branchSelect.innerHTML = "<option value=''>Select Branch</option>";
+function clearSelect(sel, placeholderText) {
+  sel.innerHTML = '';
+  const opt = document.createElement('option');
+  opt.value = '';
+  opt.textContent = placeholderText;
+  sel.appendChild(opt);
+}
 
-  const divisions = data[poSelect.value];
-  if (!divisions) return;
+// safe add option
+function addOption(sel, value, label) {
+  const opt = document.createElement('option');
+  opt.value = value;
+  opt.textContent = label ?? value;
+  sel.appendChild(opt);
+}
 
-  Object.keys(divisions).forEach(div => {
-    divisionSelect.innerHTML += <option value="${div}">${div}</option>;
-  });
-});
+// ---------------------- Initialization ----------------------
+function init() {
+  try {
+    // populate PO
+    clearSelect(poSelect, 'Select PO');
+    Object.keys(data).forEach(po => addOption(poSelect, po));
 
-// ======== ON DIVISION CHANGE =========
-divisionSelect.addEventListener("change", () => {
-  districtSelect.innerHTML = "<option value=''>Select District</option>";
-  upazillaSelect.innerHTML = "<option value=''>Select Upazilla</option>";
-  branchSelect.innerHTML = "<option value=''>Select Branch</option>";
+    // ensure dependent selects are cleared
+    clearSelect(divisionSelect, 'Select Division');
+    clearSelect(districtSelect, 'Select District');
+    clearSelect(upazillaSelect, 'Select Upazilla');
+    clearSelect(branchSelect, 'Select Branch');
 
-  const districts = data[poSelect.value][divisionSelect.value];
-  if (!districts) return;
+    // attach listeners
+    poSelect.addEventListener('change', onPoChange);
+    divisionSelect.addEventListener('change', onDivisionChange);
+    districtSelect.addEventListener('change', onDistrictChange);
+    upazillaSelect.addEventListener('change', onUpazillaChange);
 
-  Object.keys(districts).forEach(dis => {
-    districtSelect.innerHTML += <option value="${dis}">${dis}</option>;
-  });
-});
+    document.getElementById('employeeForm').addEventListener('submit', onSubmit);
 
-// ======== ON DISTRICT CHANGE =========
-districtSelect.addEventListener("change", () => {
-  upazillaSelect.innerHTML = "<option value=''>Select Upazilla</option>";
-  branchSelect.innerHTML = "<option value=''>Select Branch</option>";
+    // if you want an initial selection for demo, uncomment:
+    // poSelect.value = Object.keys(data)[0]; poSelect.dispatchEvent(new Event('change'));
+  } catch (err) {
+    console.error('Initialization error:', err);
+  }
+}
 
-  const upz = data[poSelect.value][divisionSelect.value][districtSelect.value];
-  if (!upz) return;
+// ---------------------- Change handlers ----------------------
+function onPoChange() {
+  clearSelect(divisionSelect, 'Select Division');
+  clearSelect(districtSelect, 'Select District');
+  clearSelect(upazillaSelect, 'Select Upazilla');
+  clearSelect(branchSelect, 'Select Branch');
 
-  Object.keys(upz).forEach(u => {
-    upazillaSelect.innerHTML += <option value="${u}">${u}</option>;
-  });
-});
+  const po = poSelect.value;
+  if (!po || !data[po]) return;
 
-// ======== ON UPAZILLA CHANGE =========
-upazillaSelect.addEventListener("change", () => {
-  branchSelect.innerHTML = "<option value=''>Select Branch</option>";
+  const divisions = data[po];
+  Object.keys(divisions).forEach(div => addOption(divisionSelect, div));
+}
 
-  const branches =
-    data[poSelect.value][divisionSelect.value][districtSelect.value][upazillaSelect.value];
+function onDivisionChange() {
+  clearSelect(districtSelect, 'Select District');
+  clearSelect(upazillaSelect, 'Select Upazilla');
+  clearSelect(branchSelect, 'Select Branch');
 
-  if (!branches) return;
+  const po = poSelect.value;
+  const div = divisionSelect.value;
+  if (!po || !div || !data[po] || !data[po][div]) return;
 
-  branches.forEach(b => {
-    branchSelect.innerHTML += <option value="${b}">${b}</option>;
-  });
-});
+  const districts = data[po][div];
+  Object.keys(districts).forEach(d => addOption(districtSelect, d));
+}
 
-// ======== FORM SUBMISSION =========
-document.getElementById("employeeForm").addEventListener("submit", function (e) {
-  e.preventDefault();
+function onDistrictChange() {
+  clearSelect(upazillaSelect, 'Select Upazilla');
+  clearSelect(branchSelect, 'Select Branch');
+
+  const po = poSelect.value;
+  const div = divisionSelect.value;
+  const dist = districtSelect.value;
+  if (!po || !div || !dist || !data[po] || !data[po][div] || !data[po][div][dist]) return;
+
+  const upazillas = data[po][div][dist];
+  Object.keys(upazillas).forEach(u => addOption(upazillaSelect, u));
+}
+
+function onUpazillaChange() {
+  clearSelect(branchSelect, 'Select Branch');
+
+  const po = poSelect.value;
+  const div = divisionSelect.value;
+  const dist = districtSelect.value;
+  const upa = upazillaSelect.value;
+  if (!po || !div || !dist || !upa ||
+      !data[po] || !data[po][div] || !data[po][div][dist] || !data[po][div][dist][upa]) return;
+
+  const branches = data[po][div][dist][upa];
+  if (!Array.isArray(branches)) return;
+  branches.forEach(b => addOption(branchSelect, b));
+}
+
+// ---------------------- Submit (example POST) ----------------------
+function onSubmit(evt) {
+  evt.preventDefault();
+
+  // Simple validation check
+  if (!poSelect.value || !divisionSelect.value || !districtSelect.value
+      || !upazillaSelect.value || !branchSelect.value) {
+    alert('Please select all location fields.');
+    return;
+  }
 
   const payload = {
     po: poSelect.value,
@@ -97,31 +152,41 @@ document.getElementById("employeeForm").addEventListener("submit", function (e) 
     district: districtSelect.value,
     upazilla: upazillaSelect.value,
     branch: branchSelect.value,
-    name: document.getElementById("name").value,
-    designation: document.getElementById("designation").value,
-    age: document.getElementById("age").value,
-    gender: document.getElementById("gender").value,
-    phone: document.getElementById("phone").value
+    name: el('name').value.trim(),
+    designation: el('designation').value.trim(),
+    age: el('age').value,
+    gender: el('gender').value,
+    phone: el('phone').value.trim()
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbz6WowyBXEdiN9iAfHS1fkfCsvyq0Ymaxc2v6LFpEJ4LBcG548RmNgURALpe4BRu8nH/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  // Replace with your Apps Script URL and ensure Apps Script has CORS headers
+  const WEB_APP_URL = 'YOUR_WEB_APP_URL_HERE';
+
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
-    .then(res => res.json())
-    .then(data => {
-      if (data.result === "success") {
-        alert("Employee added successfully");
-        document.getElementById("employeeForm").reset();
-      } else {
-        alert("Error: " + data.message);
-      }
-    })
-    .catch(err => alert("Request failed: " + err));
-});
-  .catch(err => alert("Fetch error: " + err));
-});
+  .then(r => r.json())
+  .then(res => {
+    if (res && res.result === 'success') {
+      alert('Employee added successfully.');
+      document.getElementById('employeeForm').reset();
+      // clear selects back to default
+      clearSelect(divisionSelect, 'Select Division');
+      clearSelect(districtSelect, 'Select District');
+      clearSelect(upazillaSelect, 'Select Upazilla');
+      clearSelect(branchSelect, 'Select Branch');
+    } else {
+      console.error('Response:', res);
+      alert('Server error: ' + (res && res.message ? res.message : 'unknown'));
+    }
+  })
+  .catch(err => {
+    console.error('Fetch error:', err);
+    alert('Network or CORS error — check console for details.');
+  });
+}
 
-
-
+// ---------------------- Run init on DOM ready ----------------------
+document.addEventListener('DOMContentLoaded', init);
