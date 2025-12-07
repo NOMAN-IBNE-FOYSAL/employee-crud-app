@@ -1,57 +1,94 @@
-const poList = ["PO1", "PO2"];
-const divisions = {
-  "Dhaka": ["Dhaka", "Gazipur"],
-  "Chattogram": ["Chattogram", "Cox's Bazar"]
-};
-const districts = {
-  "Dhaka": ["Savar", "Dhamrai"],
-  "Gazipur": ["Tongi", "Kaliakair"],
-  "Chattogram": ["Chattogram Sadar", "Anwara"],
-  "Cox's Bazar": ["Cox's Bazar Sadar", "Ukhia"]
-};
-const upazillas = {
-  "Savar": ["Savar Upazilla 1", "Savar Upazilla 2"],
-  "Dhamrai": ["Dhamrai Upazilla 1"],
-  "Tongi": ["Tongi Upazilla 1"],
-  "Kaliakair": ["Kaliakair Upazilla 1"],
-  "Chattogram Sadar": ["Sadar Upazilla 1"],
-  "Anwara": ["Anwara Upazilla 1"],
-  "Cox's Bazar Sadar": ["Sadar Upazilla 1"],
-  "Ukhia": ["Ukhia Upazilla 1"]
-};
-const branches = ["Branch 1", "Branch 2"];
+const data = {
+  "PO1": {
+    "Dhaka": {
+      "Dhaka": {
+        "Dhanmondi": ["Branch A", "Branch B"],
+        "Mirpur": ["Branch C"]
+      },
+      "Gazipur": {
+        "Tongi": ["Branch D"],
+        "Kaliakair": ["Branch E"]
+      }
+    },
 
-// Populate dropdowns
+    "Chattogram": {
+      "Chattogram": {
+        "Pahartali": ["Branch F"]
+      }
+    }
+  }
+};
+
+// ======== DOM ELEMENTS =========
 const poSelect = document.getElementById("po");
-poList.forEach(po => poSelect.add(new Option(po, po)));
-
 const divisionSelect = document.getElementById("division");
-Object.keys(divisions).forEach(d => divisionSelect.add(new Option(d, d)));
-
 const districtSelect = document.getElementById("district");
 const upazillaSelect = document.getElementById("upazilla");
 const branchSelect = document.getElementById("branch");
 
+// ======== POPULATE PO =========
+Object.keys(data).forEach(po => {
+  poSelect.innerHTML += <option value="${po}">${po}</option>;
+});
+
+// ======== ON PO CHANGE =========
+poSelect.addEventListener("change", () => {
+  divisionSelect.innerHTML = "<option value=''>Select Division</option>";
+  districtSelect.innerHTML = "<option value=''>Select District</option>";
+  upazillaSelect.innerHTML = "<option value=''>Select Upazilla</option>";
+  branchSelect.innerHTML = "<option value=''>Select Branch</option>";
+
+  const divisions = data[poSelect.value];
+  if (!divisions) return;
+
+  Object.keys(divisions).forEach(div => {
+    divisionSelect.innerHTML += <option value="${div}">${div}</option>;
+  });
+});
+
+// ======== ON DIVISION CHANGE =========
 divisionSelect.addEventListener("change", () => {
-  districtSelect.innerHTML = "";
-  const div = divisionSelect.value;
-  divisions[div].forEach(d => districtSelect.add(new Option(d, d)));
-  districtSelect.dispatchEvent(new Event("change"));
+  districtSelect.innerHTML = "<option value=''>Select District</option>";
+  upazillaSelect.innerHTML = "<option value=''>Select Upazilla</option>";
+  branchSelect.innerHTML = "<option value=''>Select Branch</option>";
+
+  const districts = data[poSelect.value][divisionSelect.value];
+  if (!districts) return;
+
+  Object.keys(districts).forEach(dis => {
+    districtSelect.innerHTML += <option value="${dis}">${dis}</option>;
+  });
 });
 
+// ======== ON DISTRICT CHANGE =========
 districtSelect.addEventListener("change", () => {
-  upazillaSelect.innerHTML = "";
-  const dist = districtSelect.value;
-  (upazillas[dist] || []).forEach(u => upazillaSelect.add(new Option(u, u)));
+  upazillaSelect.innerHTML = "<option value=''>Select Upazilla</option>";
+  branchSelect.innerHTML = "<option value=''>Select Branch</option>";
+
+  const upz = data[poSelect.value][divisionSelect.value][districtSelect.value];
+  if (!upz) return;
+
+  Object.keys(upz).forEach(u => {
+    upazillaSelect.innerHTML += <option value="${u}">${u}</option>;
+  });
 });
 
+// ======== ON UPAZILLA CHANGE =========
 upazillaSelect.addEventListener("change", () => {
-  branchSelect.innerHTML = "";
-  branches.forEach(b => branchSelect.add(new Option(b, b)));
+  branchSelect.innerHTML = "<option value=''>Select Branch</option>";
+
+  const branches =
+    data[poSelect.value][divisionSelect.value][districtSelect.value][upazillaSelect.value];
+
+  if (!branches) return;
+
+  branches.forEach(b => {
+    branchSelect.innerHTML += <option value="${b}">${b}</option>;
+  });
 });
 
-// Handle form submission
-document.getElementById("employeeForm").addEventListener("submit", e => {
+// ======== FORM SUBMISSION =========
+document.getElementById("employeeForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
   const payload = {
@@ -67,22 +104,23 @@ document.getElementById("employeeForm").addEventListener("submit", e => {
     phone: document.getElementById("phone").value
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbwKzuwfp1tHdZY39FJtFJquOO6nrRlIW49xv2rtZGe8QfHJxDkBtrXY1jWjISOn66pu/exec", { 
+  fetch("YOUR_WEB_APP_URL_HERE", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   })
-  .then(res => res.json())
-  .then(data => {
-    if (data.result === "success") {
-      alert("Employee added successfully!");
-      document.getElementById("employeeForm").reset();
-    } else {
-      alert("Error: " + data.message);
-    }
-  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result === "success") {
+        alert("Employee added successfully");
+        document.getElementById("employeeForm").reset();
+      } else {
+        alert("Error: " + data.message);
+      }
+    })
+    .catch(err => alert("Request failed: " + err));
+});
   .catch(err => alert("Fetch error: " + err));
 });
+
 
