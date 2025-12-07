@@ -1,4 +1,5 @@
-// Structure: PO -> Division -> District -> Upazilla -> [Branches array]
+// ---------------------- Data Structure ----------------------
+// PO -> Division -> District -> Upazilla -> Branch Array
 const data = {
   "PO1": {
     "Dhaka Division": {
@@ -27,122 +28,123 @@ const data = {
   }
 };
 
-// ---------------------- Helpers & DOM ----------------------
+// ---------------------- Helper Functions ----------------------
 const el = id => document.getElementById(id);
 
+function clearSelect(sel, placeholder) {
+  sel.innerHTML = "";
+  const opt = document.createElement("option");
+  opt.value = "";
+  opt.textContent = placeholder;
+  sel.appendChild(opt);
+}
+
+function addOption(sel, value, label) {
+  const opt = document.createElement("option");
+  opt.value = value;
+  opt.textContent = label ?? value;
+  sel.appendChild(opt);
+}
+
+// ---------------------- DOM Elements ----------------------
 const poSelect = el('po');
 const divisionSelect = el('division');
 const districtSelect = el('district');
 const upazillaSelect = el('upazilla');
 const branchSelect = el('branch');
 
-function clearSelect(sel, placeholderText) {
-  sel.innerHTML = '';
-  const opt = document.createElement('option');
-  opt.value = '';
-  opt.textContent = placeholderText;
-  sel.appendChild(opt);
-}
+// ---------------------- INIT ----------------------
+document.addEventListener("DOMContentLoaded", init);
 
-// safe add option
-function addOption(sel, value, label) {
-  const opt = document.createElement('option');
-  opt.value = value;
-  opt.textContent = label ?? value;
-  sel.appendChild(opt);
-}
-
-// ---------------------- Initialization ----------------------
 function init() {
   try {
-    // populate PO
-    clearSelect(poSelect, 'Select PO');
+    // Populate PO dropdown
+    clearSelect(poSelect, "Select PO");
     Object.keys(data).forEach(po => addOption(poSelect, po));
 
-    // ensure dependent selects are cleared
-    clearSelect(divisionSelect, 'Select Division');
-    clearSelect(districtSelect, 'Select District');
-    clearSelect(upazillaSelect, 'Select Upazilla');
-    clearSelect(branchSelect, 'Select Branch');
+    // Clear all dependent dropdowns
+    clearSelect(divisionSelect, "Select Division");
+    clearSelect(districtSelect, "Select District");
+    clearSelect(upazillaSelect, "Select Upazilla");
+    clearSelect(branchSelect, "Select Branch");
 
-    // attach listeners
-    poSelect.addEventListener('change', onPoChange);
-    divisionSelect.addEventListener('change', onDivisionChange);
-    districtSelect.addEventListener('change', onDistrictChange);
-    upazillaSelect.addEventListener('change', onUpazillaChange);
+    // Attach listeners
+    poSelect.addEventListener("change", onPoChange);
+    divisionSelect.addEventListener("change", onDivisionChange);
+    districtSelect.addEventListener("change", onDistrictChange);
+    upazillaSelect.addEventListener("change", onUpazillaChange);
 
-    document.getElementById('employeeForm').addEventListener('submit', onSubmit);
+    // Attach form submit handler
+    document.getElementById("employeeForm").addEventListener("submit", onSubmit);
 
-    // if you want an initial selection for demo, uncomment:
-    // poSelect.value = Object.keys(data)[0]; poSelect.dispatchEvent(new Event('change'));
   } catch (err) {
-    console.error('Initialization error:', err);
+    console.error("Init error:", err);
   }
 }
 
-// ---------------------- Change handlers ----------------------
+// ---------------------- Dropdown Change Handlers ----------------------
 function onPoChange() {
-  clearSelect(divisionSelect, 'Select Division');
-  clearSelect(districtSelect, 'Select District');
-  clearSelect(upazillaSelect, 'Select Upazilla');
-  clearSelect(branchSelect, 'Select Branch');
+  clearSelect(divisionSelect, "Select Division");
+  clearSelect(districtSelect, "Select District");
+  clearSelect(upazillaSelect, "Select Upazilla");
+  clearSelect(branchSelect, "Select Branch");
 
   const po = poSelect.value;
   if (!po || !data[po]) return;
 
-  const divisions = data[po];
-  Object.keys(divisions).forEach(div => addOption(divisionSelect, div));
+  Object.keys(data[po]).forEach(div => addOption(divisionSelect, div));
 }
 
 function onDivisionChange() {
-  clearSelect(districtSelect, 'Select District');
-  clearSelect(upazillaSelect, 'Select Upazilla');
-  clearSelect(branchSelect, 'Select Branch');
+  clearSelect(districtSelect, "Select District");
+  clearSelect(upazillaSelect, "Select Upazilla");
+  clearSelect(branchSelect, "Select Branch");
 
   const po = poSelect.value;
   const div = divisionSelect.value;
-  if (!po || !div || !data[po] || !data[po][div]) return;
 
-  const districts = data[po][div];
-  Object.keys(districts).forEach(d => addOption(districtSelect, d));
+  if (!po || !div || !data[po][div]) return;
+
+  Object.keys(data[po][div]).forEach(dist => addOption(districtSelect, dist));
 }
 
 function onDistrictChange() {
-  clearSelect(upazillaSelect, 'Select Upazilla');
-  clearSelect(branchSelect, 'Select Branch');
+  clearSelect(upazillaSelect, "Select Upazilla");
+  clearSelect(branchSelect, "Select Branch");
 
   const po = poSelect.value;
   const div = divisionSelect.value;
   const dist = districtSelect.value;
-  if (!po || !div || !dist || !data[po] || !data[po][div] || !data[po][div][dist]) return;
 
-  const upazillas = data[po][div][dist];
-  Object.keys(upazillas).forEach(u => addOption(upazillaSelect, u));
+  if (!po || !div || !dist || !data[po][div][dist]) return;
+
+  Object.keys(data[po][div][dist]).forEach(u => addOption(upazillaSelect, u));
 }
 
 function onUpazillaChange() {
-  clearSelect(branchSelect, 'Select Branch');
+  clearSelect(branchSelect, "Select Branch");
 
   const po = poSelect.value;
   const div = divisionSelect.value;
   const dist = districtSelect.value;
   const upa = upazillaSelect.value;
-  if (!po || !div || !dist || !upa ||
-      !data[po] || !data[po][div] || !data[po][div][dist] || !data[po][div][dist][upa]) return;
+
+  if (!po || !div || !dist || !upa) return;
 
   const branches = data[po][div][dist][upa];
   if (!Array.isArray(branches)) return;
+
   branches.forEach(b => addOption(branchSelect, b));
 }
 
-// ---------------------- Submit (example POST) ----------------------
-function onSubmit(evt) {
-  evt.preventDefault();
+// ---------------------- Form Submit Handler ----------------------
+async function onSubmit(e) {
+  e.preventDefault();
 
-  // Simple validation check
-  if (!poSelect.value || !divisionSelect.value || !districtSelect.value
-      || !upazillaSelect.value || !branchSelect.value) {
-    alert('Please select all location fields.');
+  // Validate dropdowns
+  if (!poSelect.value || !divisionSelect.value || !districtSelect.value ||
+      !upazillaSelect.value || !branchSelect.value) {
+    alert("Please select all dropdown fields.");
     return;
   }
 
@@ -152,41 +154,48 @@ function onSubmit(evt) {
     district: districtSelect.value,
     upazilla: upazillaSelect.value,
     branch: branchSelect.value,
-    name: el('name').value.trim(),
-    designation: el('designation').value.trim(),
-    age: el('age').value,
-    gender: el('gender').value,
-    phone: el('phone').value.trim()
+    name: el("name").value.trim(),
+    designation: el("designation").value.trim(),
+    age: el("age").value,
+    gender: el("gender").value,
+    phone: el("phone").value.trim()
   };
 
-  // Replace with your Apps Script URL and ensure Apps Script has CORS headers
-  const WEB_APP_URL = 'YOUR_WEB_APP_URL_HERE';
+  const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";  // <-- Replace with your deployed /exec URL
 
-  fetch(WEB_APP_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  .then(r => r.json())
-  .then(res => {
-    if (res && res.result === 'success') {
-      alert('Employee added successfully.');
-      document.getElementById('employeeForm').reset();
-      // clear selects back to default
-      clearSelect(divisionSelect, 'Select Division');
-      clearSelect(districtSelect, 'Select District');
-      clearSelect(upazillaSelect, 'Select Upazilla');
-      clearSelect(branchSelect, 'Select Branch');
-    } else {
-      console.error('Response:', res);
-      alert('Server error: ' + (res && res.message ? res.message : 'unknown'));
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const text = await response.text();
+    console.log("Raw response:", text);
+
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch {
+      throw new Error("Invalid JSON returned: " + text);
     }
-  })
-  .catch(err => {
-    console.error('Fetch error:', err);
-    alert('Network or CORS error — check console for details.');
-  });
-}
 
-// ---------------------- Run init on DOM ready ----------------------
-document.addEventListener('DOMContentLoaded', init);
+    if (result.result === "success") {
+      alert("Employee added successfully.");
+
+      document.getElementById("employeeForm").reset();
+
+      clearSelect(divisionSelect, "Select Division");
+      clearSelect(districtSelect, "Select District");
+      clearSelect(upazillaSelect, "Select Upazilla");
+      clearSelect(branchSelect, "Select Branch");
+
+    } else {
+      alert("Error: " + result.message);
+    }
+
+  } catch (err) {
+    console.error("Submit error:", err);
+    alert("Network or CORS error — check console.");
+  }
+}
