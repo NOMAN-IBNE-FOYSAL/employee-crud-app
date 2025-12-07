@@ -161,7 +161,7 @@ async function onSubmit(e) {
     phone: el("phone").value.trim()
   };
 
-  const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";  // <-- Replace with your deployed /exec URL
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwCybasAX5pDkK1YjLnQhRLZZnoypC-ll0UtrmX7iTnU8BMU_qlYDf38zcNt8k_Ujmx/exec";  // <-- Replace with your deployed /exec URL
 
   try {
     const response = await fetch(WEB_APP_URL, {
@@ -199,3 +199,4 @@ async function onSubmit(e) {
     alert("Network or CORS error — check console.");
   }
 }
+
